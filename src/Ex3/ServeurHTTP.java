@@ -7,7 +7,7 @@ import java.net.Socket;
 
 public class ServeurHTTP {
 
-    private static final int PORT = 6666;
+    private static final int PORT = 8080;
 
     public static void main(String[] args) {
         try {
