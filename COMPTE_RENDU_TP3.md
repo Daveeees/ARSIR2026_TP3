@@ -5,35 +5,15 @@
 **Groupe :** 12 - VOICU David et ZANNOUH Amel
 ---
 
-## Sommaire
-1. [Exercice 1 : Naviguez](#exercice-1--naviguez)
-2. [Exercice 2 : Susurrez à l'oreille du serveur](#exercice-2--susurrez-à-loreille-du-serveur)
-3. [Exercice 3 : Architecture du serveur HTTP](#exercice-3--architecture-du-serveur-http)
-4. [Exercice 4 : Décoder des requêtes HTTP](#exercice-4--décoder-des-requêtes-http)
-5. [Exercice 5 : Réponses du serveur - Les erreurs](#exercice-5--réponses-du-serveur---les-erreurs)
-6. [Exercice 6 : Réponses du serveur - Les autres (Fichiers & Succès)](#exercice-6--réponses-du-serveur---les-autres)
-7. [Exercice 7 : Virtualiser pour aller plus loin (Virtual Hosting)](#exercice-7--virtualiser-pour-aller-plus-loin)
-8. [Guide d'exécution et de test](#guide-dexécution-et-de-test)
-
----
-
 ## Exercice 1 : Naviguez
 
 ### Q1. Quels sont les messages associés aux codes 200, 404, 418 et 502?
 
-200 OK
+200 OK : requête réussi
 304 Not Modified
-404 Not Found
-418 I'm a teapot
-502 Bad Gateway
-
-#### Messages associés aux codes demandés :
-| Code HTTP | Message standard | Signification |
-| :---: | :---: | :--- |
-| **`200`** | **`OK`** | La requête a réussi. Le serveur renvoie la ressource demandée. |
-| **`404`** | **`Not Found`** | La ressource demandée n'existe pas ou n'a pas été trouvée sur le serveur. |
-| **`418`** | **`I'm a teapot`** | Code humoristique standardisé par l'IETF dans la **RFC 2324** (protocole HTCPCP - *Hyper Text Coffee Pot Control Protocol*, poisson d'avril 1998). Il indique que le serveur refuse de préparer du café car il s'agit d'une théière. |
-| **`502`** | **`Bad Gateway`** | Erreur côté serveur : un serveur agissant comme passerelle (*gateway*) ou proxy a reçu une réponse invalide du serveur en amont. |
+404 Not Found : la ressource demandée n'existe pas ou n'a pas était trouvé
+418 I'm a teapot : blague de poisson d'avril
+502 Bad Gateway : erreur côté serveur 
 
 ---
 
