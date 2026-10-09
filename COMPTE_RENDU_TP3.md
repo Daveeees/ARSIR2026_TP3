@@ -57,15 +57,9 @@ tp3/
 ├── site1/
 │   ├── index.html            (Accueil du site 1)
 │   ├── page1.html            (Page secondaire avec lien retour)
-│   ├── mon document.html     (Fichier avec espace pour tester le décodage %20)
-│   ├── style.css             (Feuille de style CSS)
 │   └── dossier/
-│       ├── index.html        (Index du sous-dossier, testé pour l'exercice 6)
+│       ├── index.html        (Index du sous-dossier)
 │       └── page2.html        (Page dans le sous-dossier avec liens)
-└── site2/                    (Utilisé pour l'exercice 7 Virtual Hosting)
-    ├── index.html            (Accueil du site virtuel 2)
-    ├── contact.html          (Page contact du site 2)
-    └── style.css             (Style personnalisé pour le site 2)
 ```
 
 ### Q2. Architecture logicielle
