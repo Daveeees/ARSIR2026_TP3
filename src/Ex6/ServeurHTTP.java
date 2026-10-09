@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
 
 public class ServeurHTTP {
 
-    private static final int PORT = 6666;
+    private static final int PORT = 8080;
     private static final String NOM_SERVEUR = "ServeurHTTP-ARSIR/1.0";
     private static final String DOSSIER_SITE = "site1";
 
@@ -123,7 +123,8 @@ public class ServeurHTTP {
             if (alt.exists()) racine = alt;
         }
 
-        File cible = (uri.equals("/") || uri.isEmpty()) ? new File(racine, "index.html") : new File(racine, uri.startsWith("/") ? uri.substring(1) : uri);
+        uri = uri.replaceFirst("^/+", "");
+        File cible = uri.isEmpty() ? new File(racine, "index.html") : new File(racine, uri);
 
         if (cible.exists() && cible.isDirectory()) {
             cible = new File(cible, "index.html");
@@ -162,10 +163,10 @@ public class ServeurHTTP {
         if (!CODES.containsKey(code)) code = 500;
 
         String corps = "<!DOCTYPE html><html><head><title>Erreur " + code + "</title></head>"
-                + "<body><h1>Erreur " + code + " : " + message + "</h1></body></html>\r\n";
+                + "<body><h1>Erreur " + code + " : " + message + "</h1></body></html>\r\n\r\n";
 
         byte[] octets = corps.getBytes(StandardCharsets.UTF_8);
-        return genererEnTete(code, octets.length, "text/html; charset=UTF-8") + corps + "\r\n";
+        return genererEnTete(code, octets.length, "text/html; charset=UTF-8") + corps;
     }
 
     public static void genererReponseSucces(OutputStream sortie, File fichier) throws IOException {
@@ -205,7 +206,11 @@ public class ServeurHTTP {
             }
 
             int code = verifierRequete(requete);
+            System.out.println("\n[Client " + socketClient.getRemoteSocketAddress() + "]");
+            System.out.println("Requête : " + requete.split("\r?\n")[0]);
+
             if (code != 200) {
+                System.out.println("-> Erreur détectée dans la requête : code HTTP " + code);
                 sortie.write(genererReponseErreur(code).getBytes(StandardCharsets.UTF_8));
                 sortie.flush();
                 socketClient.close();
@@ -213,10 +218,14 @@ public class ServeurHTTP {
             }
 
             File fichier = construireCheminFichier(requete, DOSSIER_SITE);
+            System.out.println("-> Fichier ciblé : " + (fichier != null ? fichier.getPath() : "null"));
+
             if (fichier == null || !fichier.exists() || fichier.isDirectory()) {
+                System.out.println("-> Fichier introuvable sur le disque -> Envoi 404 Not Found");
                 sortie.write(genererReponseErreur(404).getBytes(StandardCharsets.UTF_8));
                 sortie.flush();
             } else {
+                System.out.println("-> Fichier trouvé (" + fichier.length() + " octets) -> Envoi 200 OK");
                 genererReponseSucces(sortie, fichier);
             }
 
