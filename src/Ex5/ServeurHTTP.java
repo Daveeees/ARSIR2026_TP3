@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
 
 public class ServeurHTTP {
 
-    private static final int PORT = 6666;
+    private static final int PORT = 8080;
     private static final String NOM_SERVEUR = "ServeurHTTP-ARSIR/1.0";
     private static final Map<Integer, String> CODES = new HashMap<>();
 
@@ -130,6 +130,9 @@ public class ServeurHTTP {
 
             String requete = recevoirRequete(entree);
             int code = verifierRequete(requete);
+
+            System.out.println("Requête reçue :\n" + requete);
+            System.out.println("Code renvoyé : " + code + " " + CODES.get(code));
 
             if (code != 200) {
                 sortie.print(genererReponseErreur(code));
