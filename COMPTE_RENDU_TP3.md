@@ -22,24 +22,21 @@
 ### Q1. Envoi des requêtes avec Telnet vers `perdu.com 80`
 
 #### 1. Requête : `GET /\r\n`
-- **Réponse obtenue :** Selon le serveur et son niveau de compatibilité ascendante :
-  - Soit le serveur supporte **HTTP/0.9** (la toute première version du protocole) et renvoie immédiatement le contenu brut HTML sans en-tête de réponse.
-  - Soit le serveur moderne ou reverse proxy (ex. Cloudflare/nginx) refuse la requête et répond par une erreur `400 Bad Request`, car aucune version de protocole n'est spécifiée.
-- **Explication :** La syntaxe sur une seule ligne `GET /` sans version de protocole correspond au standard historique HTTP/0.9.
+Réponse : error code: 1003
+Explication : Aucun nom de site n'est donné, Cloudflare considère la requête comme un accès direct à son IP et la refuse.
 
 #### 2. Requête : `GET / HTTP/1.1\r\n\r\n`
-- **Réponse obtenue :** `HTTP/1.1 400 Bad Request`
-- **Explication :** Dans la norme **HTTP/1.1** (RFC 2616 section 14.23, RFC 7230, RFC 9112), le champ d'en-tête **`Host:` est strictement obligatoire**. Toute requête HTTP/1.1 dépourvue de l'en-tête `Host:` est invalide et **doit** être rejetée par le serveur avec le code statut `400 Bad Request`.
+Réponse : 400 Bad Request
+Explication : Le champ d'en-tête "Host:" est obligatoire. Son absence entraîne une erreur 400.
 
 #### 3. Requête : `GET / HTTP/1.1\r\nHost:perdu.com\r\n\r\n`
-- **Réponse obtenue :** `HTTP/1.1 200 OK`, suivie des en-têtes HTTP de réponse (`Date`, `Server`, `Content-Type: text/html`, `Content-Length`, etc.), d'une ligne vide, puis du corps HTML de la page d'accueil.
-- **Explication :** La requête est parfaitement formée et conforme à HTTP/1.1 (méthode, URL, version, en-tête `Host:`, et double saut de ligne `\r\n\r\n` marquant la fin des en-têtes).
+ Réponse : 200 OK (avec les en-têtes de réponse et le contenu HTML de la page.)
+ Explication : Requête HTTP/1.1 complète et bien formée.
 
-#### À quoi sert le champ `Host:` ?
-Le champ d'en-tête `Host:` indique le nom de domaine (FQDN) et le port de la ressource demandée. Il est fondamental pour le **Virtual Hosting** (hébergement virtuel par nom) :
-- Une même machine physique et une même adresse IP peuvent héberger plusieurs sites web indépendants (ex. `site1.fr` et `site2.fr`) sur le même port TCP (80).
-- Lors de l'établissement de la connexion TCP, le serveur ne connaît que son adresse IP locale et celle du client.
-- C'est donc le champ `Host:` au niveau applicatif qui permet au serveur web de déterminer quel site virtuel le client souhaite consulter et de servir les fichiers depuis le bon répertoire racine.
+à quoi sert le champ `Host:` ?
+Le champ Host: permet d'identifier le nom de domaine du site demandé,
+lorsque plusieurs sites partagent la même adresse IP. Il est obligatoire en HTTP/1.1.
+
 
 ---
 
