@@ -6,61 +6,56 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class ServeurHTTP {
 
     private static final int PORT = 6666;
-    private static final Pattern REGEX_REQUETE = Pattern.compile("^([A-Za-z]+)\\s+(\\S+)\\s+HTTP/(\\d+(?:\\.\\d+)?)$");
 
     public static void main(String[] args) {
-        try (ServerSocket socketServeur = new ServerSocket(PORT)) {
-            System.out.println("Serveur HTTP (Exo 4) démarré sur le port " + PORT + "...");
+        try (ServerSocket serveur = new ServerSocket(PORT)) {
+            System.out.println("Serveur démarré sur le port " + PORT);
 
             while (true) {
-                Socket socketClient = socketServeur.accept();
-                new Thread(() -> gererClient(socketClient)).start();
+                Socket client = serveur.accept();
+                new Thread(() -> gererClient(client)).start();
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    // Q1 : Recevoir la requête HTTP et la stocker sous forme de String
+    // Q1 : Recevoir la requête et la stocker dans une String
     public static String recevoirRequete(BufferedReader entree) throws IOException {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder requete = new StringBuilder();
         String ligne;
 
         while ((ligne = entree.readLine()) != null) {
             if (ligne.isEmpty()) break;
-            sb.append(ligne).append("\r\n");
+            requete.append(ligne).append("\r\n");
         }
 
-        return sb.toString();
+        return requete.toString();
     }
 
-    // Q2 : Vérifier la requête HTTP et retourner 400, 405 ou 200
+    // Q2 : Vérifier la requête et retourner 400, 405 ou 200
     public static int verifierRequete(String requete) {
-        if (requete == null || requete.trim().isEmpty()) return 400;
+        if (requete == null || requete.isEmpty()) return 400;
 
         String[] lignes = requete.split("\r?\n");
-        Matcher matcher = REGEX_REQUETE.matcher(lignes[0]);
+        String[] elements = lignes[0].split(" ");
 
-        if (!matcher.matches()) return 400;
+        if (elements.length != 3) return 400;
+        if (!elements[2].matches("HTTP/1\\.[01]")) return 400;
+        if (elements[1].isEmpty()) return 400;
+        if (!elements[0].matches("[A-Z]+")) return 400;
 
-        String methode = matcher.group(1);
-        String version = matcher.group(3);
+        if (!elements[0].equals("GET")) return 405;
 
-        if (!methode.equals("GET")) return 405;
-
-        if (version.equals("1.1")) {
+        if (elements[2].equals("HTTP/1.1")) {
             boolean hostPresent = false;
 
-            for (int i = 1; i < lignes.length; i++) {
-                if (lignes[i].matches("(?i)Host:\\s*\\S+.*")) {
-                    hostPresent = true;
-                }
+            for (String ligne : lignes) {
+                if (ligne.matches("(?i)Host:\\s*\\S+.*")) hostPresent = true;
             }
 
             if (!hostPresent) return 400;
@@ -69,39 +64,21 @@ public class ServeurHTTP {
         return 200;
     }
 
-    // Gérer le client : recevoir, vérifier et répondre
-    private static void gererClient(Socket socketClient) {
+    private static void gererClient(Socket client) {
         try (
-                Socket client = socketClient;
-                BufferedReader entree = new BufferedReader(new InputStreamReader(client.getInputStream()));
-                PrintWriter sortie = new PrintWriter(client.getOutputStream(), true)
+                Socket socket = client;
+                BufferedReader entree = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                PrintWriter sortie = new PrintWriter(socket.getOutputStream(), true)
         ) {
             String requete = recevoirRequete(entree);
             int code = verifierRequete(requete);
 
             System.out.println("Requête reçue :\n" + requete);
-            System.out.println("Code d'évaluation : " + code);
+            System.out.println("Code : " + code);
 
-            String description = switch (code) {
-                case 200 -> "OK";
-                case 400 -> "Bad Request";
-                case 405 -> "Method Not Allowed";
-                default -> "Error";
-            };
+            sortie.println(code);
 
-            String corps = "Code HTTP : " + code + "\n";
-            byte[] contenu = corps.getBytes(java.nio.charset.StandardCharsets.UTF_8);
-
-            sortie.print("HTTP/1.1 " + code + " " + description + "\r\n");
-            sortie.print("Content-Type: text/plain; charset=UTF-8\r\n");
-            sortie.print("Content-Length: " + contenu.length + "\r\n");
-            if (code == 405) sortie.print("Allow: GET\r\n");
-            sortie.print("Connection: close\r\n");
-            sortie.print("\r\n");
-            sortie.print(corps);
-            sortie.flush();
-
-        } catch (Exception e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
