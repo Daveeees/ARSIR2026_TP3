@@ -98,11 +98,28 @@ public class ServeurHTTP {
     }
 
     public static int verifierRequete(String requete) {
-        if (requete == null || requete.trim().isEmpty()) return 400;
-        String premiereLigne = requete.split("\r?\n")[0].trim();
-        Matcher matcher = REGEX_REQUETE.matcher(premiereLigne);
-        if (!matcher.matches()) return 400;
-        if (!matcher.group(1).equalsIgnoreCase("GET")) return 405;
+        if (requete == null || requete.isEmpty()) return 400;
+
+        String[] lignes = requete.split("\r?\n");
+        String[] elements = lignes[0].split(" ");
+
+        if (elements.length != 3) return 400;
+        if (!elements[2].matches("HTTP/1\\.[01]")) return 400;
+        if (elements[1].isEmpty()) return 400;
+        if (!elements[0].matches("[A-Z]+")) return 400;
+
+        if (!elements[0].equals("GET")) return 405;
+
+        if (elements[2].equals("HTTP/1.1")) {
+            boolean hostPresent = false;
+
+            for (String ligne : lignes) {
+                if (ligne.matches("(?i)Host:\\s*\\S+.*")) hostPresent = true;
+            }
+
+            if (!hostPresent) return 400;
+        }
+
         return 200;
     }
 
