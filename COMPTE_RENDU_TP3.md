@@ -22,14 +22,17 @@
 ### Q1. Envoi des requêtes avec Telnet vers `perdu.com 80`
 
 #### 1. Requête : `GET /\r\n`
+![img_1.png](img_1.png)
 Réponse : error code: 1003
 Explication : Aucun nom de site n'est donné, Cloudflare considère la requête comme un accès direct à son IP et la refuse.
 
 #### 2. Requête : `GET / HTTP/1.1\r\n\r\n`
+![img.png](img.png)
 Réponse : 400 Bad Request
 Explication : Le champ d'en-tête "Host:" est obligatoire. Son absence entraîne une erreur 400.
 
 #### 3. Requête : `GET / HTTP/1.1\r\nHost:perdu.com\r\n\r\n`
+![img_2.png](img_2.png)
  Réponse : 200 OK (avec les en-têtes de réponse et le contenu HTML de la page.)
  Explication : Requête HTTP/1.1 complète et bien formée.
 
