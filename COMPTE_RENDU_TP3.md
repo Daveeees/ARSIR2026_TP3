@@ -62,14 +62,6 @@ tp3/
 │       └── page2.html        (Page dans le sous-dossier avec liens)
 ```
 
-### Q2. Architecture logicielle
-Le serveur repose sur :
-- `ServerSocket(6666)` pour écouter les connexions entrantes sur le port 6666.
-- Une boucle `while (true)` avec `socketServeur.accept()`.
-- Un traitement **multi-threadé** : chaque client connecté est pris en charge par un thread dédié (`ClientHandler extends Thread`), assurant le traitement de requêtes simultanées en parallèle.
-- `BufferedReader` pour lire la requête ligne par ligne.
-- Gestion robuste des exceptions (`IOException`, `SocketException`) et fermeture systématique des ressources (`try ... catch ... finally`).
-
 ---
 
 ## Exercice 4 : Décoder des requêtes HTTP
